@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:9000/api';
 
+//only one with fetch request
 export const fetchVehicles = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles`);
@@ -62,3 +63,28 @@ export const fetchVehicleById = async (vehicleId) => {
     throw error;
   }
 };
+
+export const fetchMakers = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/makers/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching makers:', error);
+    throw error;
+  }
+};
+
+export const fetchModels = async (selectedMake) => {
+  if (!selectedMake) {
+    return [];
+  }
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/vehicleModel/${selectedMake}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching models based on make:', error);
+    throw error;
+  }
+};
+

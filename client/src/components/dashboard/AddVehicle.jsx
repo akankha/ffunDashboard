@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createVehicle as createVehicleAPI } from '../api';
+import { createVehicle as createVehicleAPI,fetchMakers as fetchMakersAPI, fetchModels as fetchModelsAPI  } from '../api';
+
 
 const AddVehicle = () => {
     const navigate = useNavigate();
@@ -27,29 +28,27 @@ const AddVehicle = () => {
 
   const fetchMakers = async () => {
     try {
-      const response = await fetch('http://localhost:9000/api/makers/');
-      const data = await response.json();
+      const data = await fetchMakersAPI();
       setMakers(data);
     } catch (error) {
       console.error('Error fetching makers:', error);
     }
   };
-
+  
   const fetchModels = async (selectedMake) => {
     if (!selectedMake) {
       setModels([]);
       return;
     }
-
+  
     try {
-      const response = await fetch(`http://localhost:9000/api/vehicleModel/${selectedMake}`);
-      const data = await response.json();
+      const data = await fetchModelsAPI(selectedMake);
       setModels(data);
     } catch (error) {
       console.error('Error fetching models based on make:', error);
     }
   };
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewVehicle((prev) => ({
