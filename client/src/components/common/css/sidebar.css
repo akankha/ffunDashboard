@@ -1,0 +1,35 @@
+.sidebar {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    width: 250px;
+}
+
+#sidebar-menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+#sidebar-menu > ul > li > a {
+    color: var(--ct-menu-item);
+    display: block;
+    padding: 12px 20px;
+    position: relative;
+    transition: all .4s;
+    font-family: Karla, sans-serif;
+    font-size: .95rem;
+}
+
+#sidebar-menu > ul > li > a i {
+    display: inline-block;
+    line-height: 1.0625rem;
+    margin: 0 7px 0 3px;
+    text-align: center;
+    vertical-align: middle;
+    width: 16px;
+    font-size: 1rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}

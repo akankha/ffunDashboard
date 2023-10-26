@@ -9,6 +9,11 @@ class Vehicle extends Model {}
 
 Vehicle.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     MakeID: DataTypes.INTEGER,
     ModelID: DataTypes.INTEGER,
     TypeID: DataTypes.INTEGER,
@@ -18,9 +23,6 @@ Vehicle.init(
     Mileage: DataTypes.INTEGER,
     Price: DataTypes.DECIMAL,
     Status: DataTypes.STRING,
-    PurchaseDate: DataTypes.DATE,
-    SaleDate: DataTypes.DATE,
-    BuyerID: DataTypes.INTEGER,
   },
   {
     sequelize,

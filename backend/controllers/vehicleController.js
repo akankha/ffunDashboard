@@ -22,7 +22,7 @@ export const getVehicles = async (req, res) => {
 
     const formattedVehicles = vehicles.map((vehicle) => {
       const formattedVehicle = {
-        id: vehicle.VehicleID,
+        id: vehicle.id,
         make: vehicle.Make ? vehicle.Make.MakeName : null,
         model: vehicle.vehicleModel ? vehicle.vehicleModel.ModelName : null,
         type: vehicle.Type ? vehicle.Type.TypeName : null,
@@ -37,11 +37,12 @@ export const getVehicles = async (req, res) => {
       if (vehicle.Status === "Sold" && vehicle.Buyer) {
         formattedVehicle.buyerName = `${vehicle.Buyer.FirstName} ${vehicle.Buyer.LastName}`;
       }
-
+      console.log(formattedVehicle);
       return formattedVehicle;
     });
 
     // Send the formatted data as a JSON response
+
     res.json(formattedVehicles);
   } catch (error) {
     console.error("Error fetching vehicles:", error);
@@ -52,6 +53,7 @@ export const getVehicles = async (req, res) => {
 // Create a new vehicle
 export const createVehicle = async (req, res) => {
   try {
+    // Extract the fields from the request body
     const {
       MakeID,
       ModelID,
@@ -62,28 +64,35 @@ export const createVehicle = async (req, res) => {
       Mileage,
       Price,
       Status,
-      PurchaseDate,
-      SaleDate,
-      BuyerID,
     } = req.body;
 
-    // Create a new vehicle record in the database
-    const newVehicle = await Vehicle.create({
+    // Create an object to hold the fields that will be included in the new vehicle record
+    const newVehicleData = {
       MakeID,
       ModelID,
       TypeID,
       Year,
       VIN,
-      Color,
-      Mileage,
-      Price,
-      Status,
-      PurchaseDate,
-      SaleDate,
-      BuyerID,
-    });
+    };
 
-    res.json(newVehicle);
+    // Include optional fields if they exist in the request body
+    if (Color !== undefined) {
+      newVehicleData.Color = Color;
+    }
+    if (Mileage !== undefined) {
+      newVehicleData.Mileage = Mileage;
+    }
+    if (Price !== undefined) {
+      newVehicleData.Price = Price;
+    }
+    if (Status !== undefined) {
+      newVehicleData.Status = Status;
+    }
+
+    // Create a new vehicle record in the database
+    const newVehicle = await Vehicle.create(newVehicleData);
+
+    res.status(201).json(newVehicle);
   } catch (error) {
     console.error("Error creating vehicle:", error);
     res.status(500).json({ error: "Database error" });
@@ -110,16 +119,16 @@ export const getVehicleById = async (req, res) => {
     if (vehicle) {
       // Format the data
       const formattedVehicle = {
-        id: vehicle.VehicleID,
-        make: vehicle.Make ? vehicle.Make.MakeName : null,
-        model: vehicle.vehicleModel ? vehicle.vehicleModel.ModelName : null,
-        type: vehicle.Type ? vehicle.Type.TypeName : null,
-        year: vehicle.Year,
-        vin: vehicle.VIN,
-        color: vehicle.Color,
-        mileage: vehicle.Mileage,
-        price: vehicle.Price,
-        status: vehicle.Status,
+        Id: vehicle.VehicleID,
+        Make: vehicle.Make ? vehicle.Make.MakeName : null,
+        Model: vehicle.vehicleModel ? vehicle.vehicleModel.ModelName : null,
+        Type: vehicle.Type ? vehicle.Type.TypeName : null,
+        Year: vehicle.Year,
+        Vin: vehicle.VIN,
+        Color: vehicle.Color,
+        Mileage: vehicle.Mileage,
+        Price: vehicle.Price,
+        Status: vehicle.Status,
       };
 
       if (vehicle.Status === "Sold" && vehicle.Buyer) {
