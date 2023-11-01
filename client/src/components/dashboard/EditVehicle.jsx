@@ -1,32 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { updateVehicle, fetchVehicleById } from '../api';
+import  { useState, useEffect } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
+import { updateVehicle } from '../api'; // Ensure this is the correct path to your API functions
+import { useNavigate } from 'react-router-dom';
 
-const EditVehicle = () => {
-  const { vehicleId } = useParams();
+const EditVehicle = ({ show, handleClose, vehicle,onVehicleUpdated }) => {
   const navigate = useNavigate();
-  
   const [vehicleData, setVehicleData] = useState({
-    MakeName: '',
-    ModelName: '',
+    ID:'',
+    Make: '',
+    Model: '',
+    Vin: '',
     Price: '',
     Status: '',
+    Color:'',
   });
-console.log(vehicleData);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedData = await fetchVehicleById(vehicleId);
-        if (fetchedData) {
-          setVehicleData(fetchedData);
-        }
-      } catch (error) {
-        console.error("Error fetching vehicle data:", error);
-      }
-    };
 
-    fetchData();
-  }, [vehicleId]);
+  useEffect(() => {
+    
+    if (vehicle) {
+      setVehicleData({
+        ID: vehicle.ID,
+        MakeName: vehicle.Make,
+        ModelName: vehicle.Model,
+        Vin: vehicle.Vin,
+        Price: vehicle.Price,
+        Status: vehicle.Status,
+        Color: vehicle.Color,
+      });
+    }
+  }, [vehicle]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,63 +37,109 @@ console.log(vehicleData);
       [name]: value,
     }));
   };
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateVehicle(vehicleId, vehicleData);
+     console.log(vehicleData);
+      await updateVehicle(vehicle.id, vehicleData);
       alert('Vehicle updated successfully!');
+      handleClose(); // Close the modal after updating
       navigate('/');
+      if (onVehicleUpdated) {
+        onVehicleUpdated(); // Call the callback function to refresh data
+      }
+      
     } catch (error) {
       alert('Error updating the vehicle.');
     }
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Edit Vehicle</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Make:</label>
-          <b>{vehicleData.Make}</b>
-        </div>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Edit Vehicle</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label>Make:</Form.Label>
+            <Form.Control
+              type="text"
+              name="MakeName"
+              disabled
+              value={vehicleData.MakeName}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Model:</label>
-          <b>{vehicleData.Model}</b> 
-        </div>
+          <Form.Group className="mb-3">
+            <Form.Label>Model:</Form.Label>
+            <Form.Control
+              type="text"
+              disabled
+              name="ModelName"
+              value={vehicleData.ModelName}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Vin:</Form.Label>
+            <Form.Control
+              type="text"
+              name="Vin"
+              value={vehicleData.Vin}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Price:</label>
-          <input
-            type="text"
-            className="form-control"
-            name="Price"  
-            value={vehicleData.Price}  
-            onChange={handleInputChange}
-          />
-        </div>
+          <Form.Group className="mb-3">
+            <Form.Label>Price:</Form.Label>
+            <Form.Control
+              type="text"
+              name="Price"
+              value={vehicleData.Price}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Color:</Form.Label>
+            <Form.Control
+              type="text"
+              name="Color"
+              value={vehicleData.Color}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label className="form-label">Status:</label>
-          <select
-            className="form-select"
-            name="Status"  
-            value={vehicleData.Status}  
-            onChange={handleInputChange}
-          >
-            <option value="">Select Status</option>
-            <option value="In Stock">In Stock</option>
-            <option value="Sold">Sold</option>
-          </select>
-        </div>
+          <Form.Group>
+            <Form.Label>Status:</Form.Label>
+            <Form.Check
+              type="radio"
+              label="In Stock"
+              name="Status"
+              value="In Stock"
+              checked={vehicleData.Status === "In Stock"}
+              onChange={handleInputChange}
+            />
+            <Form.Check
+              type="radio"
+              label="Sold"
+              name="Status"
+              value="Sold"
+              checked={vehicleData.Status === "Sold"}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
 
-        <button type="submit" className="btn btn-primary">
-          Update Vehicle
-        </button>
-      </form>
-    </div>
+          <Button variant="primary" type="submit">
+            Update Vehicle
+          </Button>
+        </Form>
+      </Modal.Body>
+      
+    </Modal>
   );
-}
+};
 
 export default EditVehicle;

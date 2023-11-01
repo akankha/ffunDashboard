@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchVehicles, deleteVehicle } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { fetchVehicles, deleteVehicle,fetchVehicleById } from '../api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
-
+import EditVehicle from './EditVehicle';
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -12,8 +11,12 @@ const VehicleList = () => {
   const [vehicleToDelete, setVehicleToDelete] = useState(null);
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
+  const [editModalShow, setEditModalShow] = useState(false); // State for showing/hiding the edit modal
+  const [vehicleToEdit, setVehicleToEdit] = useState(null); // State for the vehicle to edit
+
+
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+ 
 
   useEffect(() => {
     fetchVehicles()
@@ -25,11 +28,36 @@ const VehicleList = () => {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  const handleEdit = (vehicle) => navigate(`/edit/${vehicle.id}`);
 
+const handleEdit = async (vehicleId) => {
+  try {
+    const vehicleData = await fetchVehicleById(vehicleId);
+   
+    setVehicleToEdit(vehicleData);
+    setEditModalShow(true);
+  }catch (error) {
+    console.error('Error fetching vehicle:', error);
+    // Handle the error appropriately
+  }
+};
+const refreshVehicleData = async () => {
+  try {
+    const updatedVehicles = await fetchVehicles();
+    const sortedVehicles = [...updatedVehicles].sort((a, b) => a.id - b.id); // Sorting by ID
+    setVehicles(sortedVehicles);
+    setFilteredVehicles(sortedVehicles);
+  } catch (error) {
+    console.error('Error refreshing vehicle data:', error);
+  }
+};
+  const handleCloseEditModal = () => {
+    setEditModalShow(false); // Close the edit modal
+    setVehicleToEdit(null); // Reset the vehicle to edit
+  };
   const handleSearchChange = (e) => {
-    const value = e.target.value.toLowerCase();
+    const value = e.target.value.toString();
     setSearchValue(value);
+    
     const filtered = vehicles.filter(vehicle => 
       vehicle.id.toString().includes(value) ||
       vehicle.make.toLowerCase().includes(value) ||
@@ -91,6 +119,7 @@ const VehicleList = () => {
           return a.status.localeCompare(b.status);
         });
         break;
+        
       default:
         break;
     }
@@ -111,7 +140,7 @@ const VehicleList = () => {
     { name: 'Sold', count: soldCount },
     { name: 'In Stock', count: inStockCount }
   ];
-
+  
   return (
 
     <div className="container mt-5">
@@ -182,6 +211,8 @@ const VehicleList = () => {
           </tr>
         </thead>
         <tbody>
+
+          
           {currentVehicles.map(vehicle => (
             <tr key={vehicle.id}>
               <td>{vehicle.id}</td>
@@ -189,11 +220,16 @@ const VehicleList = () => {
               <td>{vehicle.model}</td>
               <td>{vehicle.year}</td>
               <td>{vehicle.vin}</td>
+              {/* <td>${parseInt(vehicle.price).toLocaleString(navigator.language, { minimumFractionDigits: 2 })}</td> */}     
+              {/* <td>
+               ${parseFloat(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td> */}
               <td>{vehicle.price}</td>
               <td>{vehicle.color}</td>
               <td>{vehicle.status}</td>
               <td>
-                <button className="btn btn-primary mr-2" onClick={() => handleEdit(vehicle)}>Edit</button>
+              <button className="btn btn-primary mr-2" onClick={() => handleEdit(vehicle.id)}>Edit</button>
+
                 <button className="btn btn-danger mr-2" onClick={() => handleDelete(vehicle.id)}>Delete</button>
               </td>
             </tr>
@@ -214,7 +250,17 @@ const VehicleList = () => {
         </ul>
   
       </div>
+      <EditVehicle
+        show={editModalShow}
+        handleClose={handleCloseEditModal}
+        vehicle={vehicleToEdit}
+        onVehicleUpdated={refreshVehicleData}
+      />
     </div>
+
+
+
+
   );
 };
 

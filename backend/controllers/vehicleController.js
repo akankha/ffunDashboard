@@ -118,8 +118,9 @@ export const getVehicleById = async (req, res) => {
 
     if (vehicle) {
       // Format the data
+
       const formattedVehicle = {
-        Id: vehicle.VehicleID,
+        id: vehicle.id,
         Make: vehicle.Make ? vehicle.Make.MakeName : null,
         Model: vehicle.vehicleModel ? vehicle.vehicleModel.ModelName : null,
         Type: vehicle.Type ? vehicle.Type.TypeName : null,
@@ -134,7 +135,7 @@ export const getVehicleById = async (req, res) => {
       if (vehicle.Status === "Sold" && vehicle.Buyer) {
         formattedVehicle.buyerName = `${vehicle.Buyer.FirstName} ${vehicle.Buyer.LastName}`;
       }
-
+      console.log(formattedVehicle);
       // Send the formatted data as a JSON response
       res.json(formattedVehicle);
     } else {

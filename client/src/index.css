@@ -5,3 +5,7 @@
 label.form-label.mr-2 {
     width: 100px;
 }
+.form-check {
+    display: inline-block;
+    padding: 2rem;
+}

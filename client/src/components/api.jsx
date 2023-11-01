@@ -56,6 +56,7 @@ export const deleteVehicle = async (vehicleId) => {
 export const fetchVehicleById = async (vehicleId) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/vehicles/${vehicleId}`);
+    console.log(response.data);
     if (response.status !== 200) throw new Error('Failed to fetch vehicle details');
     return response.data;
   } catch (error) {
